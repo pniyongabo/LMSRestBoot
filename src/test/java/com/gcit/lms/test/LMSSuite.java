@@ -6,6 +6,8 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
+import com.gcit.lms.LMSConfig;
+
 @RunWith(Suite.class)
 @SuiteClasses({ AuthorTest.class})
 @ContextConfiguration(classes=LMSConfig.class, loader=AnnotationConfigContextLoader.class)

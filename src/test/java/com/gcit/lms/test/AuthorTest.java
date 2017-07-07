@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
 
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +17,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
+import com.gcit.lms.LMSConfig;
 import com.gcit.lms.dao.AuthorDAO;
 import com.gcit.lms.entity.Author;
 import com.gcit.lms.service.AdminService;
