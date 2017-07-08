@@ -66,7 +66,7 @@ public class AdminService {
 		return a_viewBooks();
 	}
 	
-	@RequestMapping(value = "/a_viewbooks", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewbooks", method = RequestMethod.GET, produces="application/json")
 	public List<Book> a_viewBooks() throws SQLException { 
 		List<Book> books =  bdao.readAllBooks();
 		for (Book b: books){
@@ -77,7 +77,7 @@ public class AdminService {
 		return books;
 	}
 	
-	@RequestMapping(value = "/a_viewbooks/{pageNo}", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewbooks/{pageNo}", method = RequestMethod.GET, produces="application/json")
 	public List<Book> a_viewBooks(@PathVariable Integer pageNo) throws SQLException { 
 		List<Book> books =  bdao.readAllBooks(pageNo);
 		for (Book b: books){
@@ -88,7 +88,7 @@ public class AdminService {
 		return books;
 	}
 	
-	@RequestMapping(value = "/a_viewbooks/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewbooks/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
 	public List<Book> a_viewBooks(@PathVariable Integer pageNo, 
 			@PathVariable String searchString) throws SQLException { 
 		List<Book> books =  bdao.readAllBooksByName(pageNo, searchString);
@@ -129,7 +129,7 @@ public class AdminService {
 		return a_viewAuthors();
 	}
 	
-	@RequestMapping(value = "/a_viewauthors/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewauthors/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
 	public List<Author> a_viewAuthors(@PathVariable Integer pageNo, 
 			@PathVariable String searchString) throws SQLException { 
 		List<Author> authors =  adao.readAllAuthorsByName(pageNo, searchString);
@@ -139,7 +139,7 @@ public class AdminService {
 		return authors;
 	}
 	
-	@RequestMapping(value = "/a_viewauthors/{pageNo}", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewauthors/{pageNo}", method = RequestMethod.GET, produces="application/json")
 	public List<Author> a_viewAuthors(@PathVariable Integer pageNo) throws SQLException { 
 		List<Author> authors =  adao.readAllAuthors(pageNo);
 		for (Author a: authors){
@@ -148,7 +148,7 @@ public class AdminService {
 		return authors;
 	}
 	
-	@RequestMapping(value = "/a_viewauthors", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewauthors", method = RequestMethod.GET, produces="application/json")
 	public List<Author> a_viewAuthors() throws SQLException { 
 		List<Author> authors =  adao.readAllAuthors();
 		for (Author a: authors){
