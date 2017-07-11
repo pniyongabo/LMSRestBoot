@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,7 @@ import com.gcit.lms.entity.Borrower;
 import com.gcit.lms.entity.Branch;
 import com.gcit.lms.entity.Publisher;
 
+@CrossOrigin
 @RestController
 public class AdminService {
 	@Autowired
@@ -53,13 +55,13 @@ public class AdminService {
     // Books pages
     //================================================================================
 	
-	@RequestMapping(value = "addBook", method = RequestMethod.POST, consumes="application/json")
+	@RequestMapping(value = "/api/addBook", method = RequestMethod.POST, consumes="application/json")
 	public String addBook(@RequestBody Book book) throws SQLException {
 		bdao.addBook(book);
 		return "Book Added - Success is in the AIR!";
 	}
 	
-	@RequestMapping(value = "editBook", method = RequestMethod.POST, 
+	@RequestMapping(value = "/api/aeditBook", method = RequestMethod.POST, 
 			consumes="application/json", produces="application/json")
 	public List<Book> editBook(@RequestBody Book book) throws SQLException {
 		bdao.updateBook(book);
@@ -100,7 +102,7 @@ public class AdminService {
 		return books;
 	}
 	
-	@RequestMapping(value = "deleteBook", method = RequestMethod.POST, consumes="application/json ")
+	@RequestMapping(value = "/api/deleteBook", method = RequestMethod.POST, consumes="application/json ")
 	public String deleteBook(@RequestBody Book book) throws SQLException {
 		bdao.deleteBook(book);
 		return "Book deleted successfully!";
@@ -110,19 +112,19 @@ public class AdminService {
     // Authors pages
     //================================================================================
 	
-	@RequestMapping(value = "addAuthor", method = RequestMethod.POST, consumes="application/json")
+	@RequestMapping(value = "/api/addAuthor", method = RequestMethod.POST, consumes="application/json")
 	public String addAuthor(@RequestBody Author author) throws SQLException {
 		adao.addAuthor(author);
 		return "Author Added - Success is in the AIR!";
 	}
 	
 	@Transactional
-	@RequestMapping(value = "/saveAuthorWithID", method = RequestMethod.POST, consumes="application/json")
+	@RequestMapping(value = "/api/saveAuthorWithID", method = RequestMethod.POST, consumes="application/json")
 	public Integer saveAuthorWithID(@RequestBody Author author) throws SQLException {
 			return adao.addAuthorWithID(author);
 	}
 	
-	@RequestMapping(value = "editAuthor", method = RequestMethod.POST, 
+	@RequestMapping(value = "/api/editAuthor", method = RequestMethod.POST, 
 			consumes="application/json", produces="application/json")
 	public List<Author> editBook(@RequestBody Author author) throws SQLException {
 		adao.updateAuthor(author);
@@ -157,7 +159,7 @@ public class AdminService {
 		return authors;
 	}
 	
-	@RequestMapping(value = "deleteAuthor", method = RequestMethod.POST, consumes="application/json ")
+	@RequestMapping(value = "/api/deleteAuthor", method = RequestMethod.POST, consumes="application/json ")
 	public String deleteAuthor(@RequestBody Author author) throws SQLException {
 		adao.deleteAuthor(author);
 		return "Author deleted successfully!";
@@ -168,21 +170,21 @@ public class AdminService {
     //================================================================================
 
 	@Transactional
-	@RequestMapping(value = "addBorrower", method = RequestMethod.POST, consumes="application/json")
+	@RequestMapping(value = "/api/addBorrower", method = RequestMethod.POST, consumes="application/json")
 	public String addBorrower(@RequestBody Borrower borrower) throws SQLException {
 		bodao.addBorrower(borrower);
 		return "borrower Added - Success is in the AIR!";
 	}
 	
 	@Transactional
-	@RequestMapping(value = "editBorrower", method = RequestMethod.POST, 
+	@RequestMapping(value = "/api/editBorrower", method = RequestMethod.POST, 
 			consumes="application/json", produces="application/json")
 	public List<Borrower> editBook(@RequestBody Borrower borrower) throws SQLException {
 		bodao.updateBorrower(borrower);
 		return a_viewborrowers();
 	}
 	
-	@RequestMapping(value = "/a_viewborrowers/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewborrowers/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
 	public List<Borrower> a_viewborrowers(@PathVariable Integer pageNo, 
 			@PathVariable String searchString) throws SQLException { 
 		List<Borrower> borrowers =  bodao.readAllBorrowersByName(pageNo, searchString);
@@ -222,21 +224,21 @@ public class AdminService {
     //================================================================================
 	
 	@Transactional
-	@RequestMapping(value = "addBranch", method = RequestMethod.POST, consumes="application/json")
+	@RequestMapping(value = "/api/addBranch", method = RequestMethod.POST, consumes="application/json")
 	public String addBranch(@RequestBody Branch branch) throws SQLException {
 		brdao.addBranch(branch);
 		return "branch Added - Success is in the AIR!";
 	}
 	
 	@Transactional
-	@RequestMapping(value = "editBranch", method = RequestMethod.POST, 
+	@RequestMapping(value = "/api/editBranch", method = RequestMethod.POST, 
 			consumes="application/json", produces="application/json")
 	public List<Branch> editBranch(@RequestBody Branch branch) throws SQLException {
 		brdao.updateBranch(branch);
 		return a_viewbranches();
 	}
 	
-	@RequestMapping(value = "/a_viewbranches/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewbranches/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
 	public List<Branch> a_viewbranches(@PathVariable Integer pageNo, 
 			@PathVariable String searchString) throws SQLException { 
 		List<Branch> branches =  brdao.readAllBranchesByName(pageNo, searchString);
@@ -247,7 +249,7 @@ public class AdminService {
 		return branches;
 	}
 	
-	@RequestMapping(value = "/a_viewbranches/{pageNo}", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewbranches/{pageNo}", method = RequestMethod.GET, produces="application/json")
 	public List<Branch> a_viewbranches(@PathVariable Integer pageNo) throws SQLException { 
 		List<Branch> branches =  brdao.readAllBranches(pageNo);
 		for (Branch br: branches){
@@ -257,7 +259,7 @@ public class AdminService {
 		return branches;
 	}
 	
-	@RequestMapping(value = "/a_viewbranches", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewbranches", method = RequestMethod.GET, produces="application/json")
 	public List<Branch> a_viewbranches() throws SQLException { 
 		List<Branch> branches =  brdao.readAllBranches();
 		for (Branch br: branches){
@@ -268,7 +270,7 @@ public class AdminService {
 	}
 	
 	@Transactional
-	@RequestMapping(value = "deleteBranch", method = RequestMethod.POST, consumes="application/json ")
+	@RequestMapping(value = "/api/deleteBranch", method = RequestMethod.POST, consumes="application/json ")
 	public String deleteBranch(@RequestBody Branch branch) throws SQLException {
 		brdao.deleteBranch(branch);
 		return "branch deleted successfully!";
@@ -280,21 +282,21 @@ public class AdminService {
 	
 	
 	@Transactional
-	@RequestMapping(value = "addPublisher", method = RequestMethod.POST, consumes="application/json")
+	@RequestMapping(value = "/api/addPublisher", method = RequestMethod.POST, consumes="application/json")
 	public String addPublisher(@RequestBody Publisher publisher) throws SQLException {
 		pdao.addPublisher(publisher);
 		return "publisher Added - Success is in the AIR!";
 	}
 	
 	@Transactional
-	@RequestMapping(value = "editPublisher", method = RequestMethod.POST, 
+	@RequestMapping(value = "/api/editPublisher", method = RequestMethod.POST, 
 			consumes="application/json", produces="application/json")
 	public List<Publisher> editPulisher(@RequestBody Publisher publisher) throws SQLException {
 		pdao.updatePublisher(publisher);
 		return a_viewpublishers();
 	}
 	
-	@RequestMapping(value = "/a_viewpublishers/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewpublishers/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
 	public List<Publisher> a_viewpublishers(@PathVariable Integer pageNo, 
 			@PathVariable String searchString) throws SQLException { 
 		List<Publisher> publishers =  pdao.readAllPublishersByName(pageNo, searchString);
@@ -304,7 +306,7 @@ public class AdminService {
 		return publishers;
 	}
 	
-	@RequestMapping(value = "/a_viewpublishers/{pageNo}", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewpublishers/{pageNo}", method = RequestMethod.GET, produces="application/json")
 	public List<Publisher> a_viewpublishers(@PathVariable Integer pageNo) throws SQLException { 
 		List<Publisher> publishers =  pdao.readAllPublishers(pageNo);
 		for (Publisher p:publishers){
@@ -313,7 +315,7 @@ public class AdminService {
 		return publishers;
 	}
 	
-	@RequestMapping(value = "/a_viewpublishers", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewpublishers", method = RequestMethod.GET, produces="application/json")
 	public List<Publisher> a_viewpublishers() throws SQLException { 
 		List<Publisher> publishers =  pdao.readAllPublishers();
 		for (Publisher p:publishers){
@@ -323,7 +325,7 @@ public class AdminService {
 	}
 	
 	@Transactional
-	@RequestMapping(value = "deletePublisher", method = RequestMethod.POST, consumes="application/json ")
+	@RequestMapping(value = "/api/deletePublisher", method = RequestMethod.POST, consumes="application/json ")
 	public String deletePublisher(@RequestBody Publisher publisher) throws SQLException {
 		pdao.deletePublisher(publisher);
 		return "publisher deleted successfully!";
@@ -335,24 +337,24 @@ public class AdminService {
 	
 	
 	@Transactional
-	@RequestMapping(value = "editBookLoan", method = RequestMethod.POST, 
+	@RequestMapping(value = "/api/editBookLoan", method = RequestMethod.POST, 
 			consumes="application/json", produces="application/json")
 	public List<BookLoan> editBookLoan(@RequestBody BookLoan bookloan) throws SQLException {
 		bldao.updateBookLoan(bookloan);
 		return a_viewbookloans();
 	}
 	
-	@RequestMapping(value = "/a_viewbookloans", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewbookloans", method = RequestMethod.GET, produces="application/json")
 	public List<BookLoan> a_viewbookloans() throws SQLException {
 		return bldao.readAllBookLoans();
 	}
 	
-	@RequestMapping(value = "/a_viewbookloans/{pageNo}", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewbookloans/{pageNo}", method = RequestMethod.GET, produces="application/json")
 	public List<BookLoan> a_viewbookloans(@PathVariable Integer pageNo) throws SQLException {
 		return bldao.readAllBookLoans(pageNo);
 	}
 	
-	@RequestMapping(value = "/a_viewbookloans/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
+	@RequestMapping(value = "/api/a_viewbookloans/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
 	public List<BookLoan> a_viewbookloans(@PathVariable Integer pageNo, 
 			@PathVariable String searchString) throws SQLException {
 		return bldao.readAllBookLoansByDateOut(pageNo, searchString);

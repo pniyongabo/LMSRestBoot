@@ -1,7 +1,7 @@
 package com.gcit.lms;
 
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,7 +10,7 @@ import com.gcit.lms.service.AdminService;
 /**
  * Handles requests for the application home page.
  */
-//@CrossOrigin
+@CrossOrigin
 @RestController
 public class HomeController {
 	
