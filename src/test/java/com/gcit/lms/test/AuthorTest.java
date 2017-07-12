@@ -50,7 +50,7 @@ public class AuthorTest {
 		Author author = new Author();
 		when(adao.addAuthorWithID(author)).thenReturn(new Integer(1));
 		author.setAuthorName("Junit Integ Test Author");
-		authorId = adminService.saveAuthorWithID(author);
+		authorId = adminService.addAuthorWithID(author);
 		//System.out.println("Test Author ID: " +authorId);
 		assertNotNull(authorId);
 		assertEquals(new Integer(1), authorId);

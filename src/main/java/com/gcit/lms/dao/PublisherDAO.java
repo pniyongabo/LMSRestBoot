@@ -120,8 +120,8 @@ public class PublisherDAO extends BaseDAO implements ResultSetExtractor<List<Pub
 		return null;
 	}
 	
-	public Publisher readPublisherByBookId(Integer bookId) throws SQLException {
-		List<Publisher> publishers = template.query("select * from tbl_publisher where publisherId IN (Select pubId from tbl_book where bookId = ?)", new Object[]{bookId} , this);
+	public Publisher readPublisherByPubId(Integer publisherId) throws SQLException {
+		List<Publisher> publishers = template.query("select * from tbl_publisher where publisherId IN (Select pubId from tbl_book where bookId = ?)", new Object[]{publisherId} , this);
 		if(publishers!=null && publishers.size() > 0){
 			return publishers.get(0);
 		}

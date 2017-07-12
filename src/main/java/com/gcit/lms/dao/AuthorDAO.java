@@ -84,7 +84,7 @@ public class AuthorDAO extends BaseDAO implements ResultSetExtractor<List<Author
 		return template.queryForObject("select count(*) as COUNT from tbl_author where authorName like ?",new Object[]{searchString},Integer.class);
 	}
 	
-	public Author readAuthorsByPK(Integer authorId) throws SQLException{
+	public Author readAuthorByPK(Integer authorId) throws SQLException{
 		List<Author> authors = template.query("select * from tbl_author where authorId = ?", new Object[]{authorId}, this);
 		if(authors!=null){
 			return authors.get(0);

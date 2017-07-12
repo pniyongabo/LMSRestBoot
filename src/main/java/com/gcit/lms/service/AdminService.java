@@ -2,6 +2,7 @@
 package com.gcit.lms.service;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gcit.lms.dao.AuthorDAO;
@@ -55,55 +57,65 @@ public class AdminService {
     // Books pages
     //================================================================================
 	
-	@RequestMapping(value = "/api/addBook", method = RequestMethod.POST, consumes="application/json")
-	public String addBook(@RequestBody Book book) throws SQLException {
-		bdao.addBook(book);
-		return "Book Added - Success is in the AIR!";
+	@RequestMapping(value = "/api/books", method = RequestMethod.POST, consumes="application/json")
+	public Book addBook(@RequestBody Book book) throws SQLException { // create for POST
+		Book newBook = bdao.readBookByPK(bdao.addBookWithID(book));
+		return newBook;
 	}
 	
-	@RequestMapping(value = "/api/aeditBook", method = RequestMethod.POST, 
-			consumes="application/json", produces="application/json")
-	public List<Book> editBook(@RequestBody Book book) throws SQLException {
+	@RequestMapping(value = "/api/books/{bookId}", method = RequestMethod.PUT, 
+			consumes="application/json", produces="application/json") // update for PUT
+	public List<Book> editBook(@RequestBody Book book, @PathVariable Integer bookId) throws SQLException {
+		book.setBookId(bookId);
 		bdao.updateBook(book);
-		return a_viewBooks();
+		return a_viewBooks(null, null);
 	}
 	
-	@RequestMapping(value = "/api/a_viewbooks", method = RequestMethod.GET, produces="application/json")
-	public List<Book> a_viewBooks() throws SQLException { 
-		List<Book> books =  bdao.readAllBooks();
+//	@RequestMapping(value = "/api/books", method = RequestMethod.GET, produces="application/json")
+//	public List<Book> a_viewBooks() throws SQLException { 
+//		List<Book> books =  bdao.readAllBooks();
+//		for (Book b: books){
+//			b.setAuthors(adao.readAllAuthorsByBookId(b.getBookId()));
+//			b.setGenres(gdao.readAllGenresByBookId(b.getBookId()));
+//			b.setPublisher(pdao.readPublisherByPubId(b.getBookId()));
+//		}
+//		return books;
+//	}
+//	
+//	@RequestMapping(value = "/api/books", method = RequestMethod.GET, produces="application/json")
+//	public List<Book> a_viewBooks(@RequestParam(value = "pageNo", required = false) Integer pageNo) throws SQLException { 
+//		List<Book> books =  bdao.readAllBooks(pageNo);
+//		for (Book b: books){
+//			b.setAuthors(adao.readAllAuthorsByBookId(b.getBookId()));
+//			b.setGenres(gdao.readAllGenresByBookId(b.getBookId()));
+//			b.setPublisher(pdao.readPublisherByPubId(b.getBookId()));
+//		}
+//		return books;
+//	}
+	
+	@RequestMapping(value = "/api/books", method = RequestMethod.GET, produces="application/json")
+	public List<Book> a_viewBooks(@RequestParam(value = "pageNo", required = false) Integer pageNo, 
+			@RequestParam(value = "searchString", required = false) String searchString) throws SQLException { 
+		List<Book> books = new ArrayList<Book>();
+		if (pageNo!=null && searchString != null){
+			books = bdao.readAllBooksByName(pageNo, searchString);
+		}else if (pageNo != null){
+			books =  bdao.readAllBooks(pageNo);
+		}else{
+			books =  bdao.readAllBooks();
+		}
+		
 		for (Book b: books){
 			b.setAuthors(adao.readAllAuthorsByBookId(b.getBookId()));
 			b.setGenres(gdao.readAllGenresByBookId(b.getBookId()));
-			b.setPublisher(pdao.readPublisherByBookId(b.getBookId()));
+			b.setPublisher(pdao.readPublisherByPubId(b.getBookId()));
 		}
 		return books;
 	}
 	
-	@RequestMapping(value = "/api/a_viewbooks/{pageNo}", method = RequestMethod.GET, produces="application/json")
-	public List<Book> a_viewBooks(@PathVariable Integer pageNo) throws SQLException { 
-		List<Book> books =  bdao.readAllBooks(pageNo);
-		for (Book b: books){
-			b.setAuthors(adao.readAllAuthorsByBookId(b.getBookId()));
-			b.setGenres(gdao.readAllGenresByBookId(b.getBookId()));
-			b.setPublisher(pdao.readPublisherByBookId(b.getBookId()));
-		}
-		return books;
-	}
-	
-	@RequestMapping(value = "/api/a_viewbooks/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
-	public List<Book> a_viewBooks(@PathVariable Integer pageNo, 
-			@PathVariable String searchString) throws SQLException { 
-		List<Book> books =  bdao.readAllBooksByName(pageNo, searchString);
-		for (Book b: books){
-			b.setAuthors(adao.readAllAuthorsByBookId(b.getBookId()));
-			b.setGenres(gdao.readAllGenresByBookId(b.getBookId()));
-			b.setPublisher(pdao.readPublisherByBookId(b.getBookId()));
-		}
-		return books;
-	}
-	
-	@RequestMapping(value = "/api/deleteBook", method = RequestMethod.POST, consumes="application/json ")
-	public String deleteBook(@RequestBody Book book) throws SQLException {
+	@RequestMapping(value = "/api/books/{bookId}", method = RequestMethod.DELETE, consumes="application/json ")
+	public String deleteBook(@RequestBody Book book, @PathVariable Integer bookId) throws SQLException {
+		book.setBookId(bookId);
 		bdao.deleteBook(book);
 		return "Book deleted successfully!";
 	}
@@ -112,55 +124,71 @@ public class AdminService {
     // Authors pages
     //================================================================================
 	
-	@RequestMapping(value = "/api/addAuthor", method = RequestMethod.POST, consumes="application/json")
+	/* @RequestMapping(value = "/api/authors", method = RequestMethod.POST, consumes="application/json")
 	public String addAuthor(@RequestBody Author author) throws SQLException {
 		adao.addAuthor(author);
 		return "Author Added - Success is in the AIR!";
-	}
+	} */
 	
+	
+	// USEFUL FOR RETURNING A LOCATION HEADER TO THE ID OF THE NEW CREATED RESOURCE 
 	@Transactional
-	@RequestMapping(value = "/api/saveAuthorWithID", method = RequestMethod.POST, consumes="application/json")
-	public Integer saveAuthorWithID(@RequestBody Author author) throws SQLException {
-			return adao.addAuthorWithID(author);
+	@RequestMapping(value = "/api/authors", method = RequestMethod.POST, consumes="application/json")
+	public Author addAuthor(@RequestBody Author author) throws SQLException {
+			return adao.readAuthorByPK(adao.addAuthorWithID(author));
 	}
 	
-	@RequestMapping(value = "/api/editAuthor", method = RequestMethod.POST, 
+	public Integer addAuthorWithID(@RequestBody Author author) throws SQLException {
+		return adao.addAuthorWithID(author);
+	}
+	
+	
+	@RequestMapping(value = "/api/authors/{authorId}", method = RequestMethod.PUT, 
 			consumes="application/json", produces="application/json")
-	public List<Author> editBook(@RequestBody Author author) throws SQLException {
+	public List<Author> editBook(@RequestBody Author author, @PathVariable Integer authorId) throws SQLException {
+		author.setAuthorId(authorId);
 		adao.updateAuthor(author);
-		return a_viewAuthors();
+		return a_viewAuthors(null, null);
 	}
 	
-	@RequestMapping(value = "/api/a_viewauthors/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
-	public List<Author> a_viewAuthors(@PathVariable Integer pageNo, 
-			@PathVariable String searchString) throws SQLException { 
-		List<Author> authors =  adao.readAllAuthorsByName(pageNo, searchString);
+//	@RequestMapping(value = "/api/authors", method = RequestMethod.GET, produces="application/json")
+//	public List<Author> a_viewAuthors() throws SQLException { 
+//		List<Author> authors =  adao.readAllAuthors();
+//		for (Author a: authors){
+//			a.setBooks(bdao.readAllBooksByAuthorId(a.getAuthorId()));
+//		}
+//		return authors;
+//	}
+//	
+//	@RequestMapping(value = "/api/authors", method = RequestMethod.GET, produces="application/json")
+//	public List<Author> a_viewAuthors(@RequestParam(value = "pageNo", required = false) Integer pageNo) throws SQLException { 
+//		List<Author> authors =  adao.readAllAuthors(pageNo);
+//		for (Author a: authors){
+//			a.setBooks(bdao.readAllBooksByAuthorId(a.getAuthorId()));
+//		}
+//		return authors;
+//	}
+	
+	@RequestMapping(value = "/api/authors", method = RequestMethod.GET, produces="application/json")
+	public List<Author> a_viewAuthors(@RequestParam(value = "pageNo", required = false) Integer pageNo, 
+			@RequestParam(value = "searchString", required = false) String searchString) throws SQLException { 
+		List<Author> authors =  new ArrayList<Author>();
+		if (pageNo!=null && searchString != null){
+			authors = adao.readAllAuthorsByName(pageNo, searchString);
+		}else if (pageNo != null){
+			authors =  adao.readAllAuthors(pageNo);
+		}else{
+			authors =  adao.readAllAuthors();
+		}
 		for (Author a: authors){
 			a.setBooks(bdao.readAllBooksByAuthorId(a.getAuthorId()));
 		}
 		return authors;
 	}
 	
-	@RequestMapping(value = "/api/a_viewauthors/{pageNo}", method = RequestMethod.GET, produces="application/json")
-	public List<Author> a_viewAuthors(@PathVariable Integer pageNo) throws SQLException { 
-		List<Author> authors =  adao.readAllAuthors(pageNo);
-		for (Author a: authors){
-			a.setBooks(bdao.readAllBooksByAuthorId(a.getAuthorId()));
-		}
-		return authors;
-	}
-	
-	@RequestMapping(value = "/api/a_viewauthors", method = RequestMethod.GET, produces="application/json")
-	public List<Author> a_viewAuthors() throws SQLException { 
-		List<Author> authors =  adao.readAllAuthors();
-		for (Author a: authors){
-			a.setBooks(bdao.readAllBooksByAuthorId(a.getAuthorId()));
-		}
-		return authors;
-	}
-	
-	@RequestMapping(value = "/api/deleteAuthor", method = RequestMethod.POST, consumes="application/json ")
-	public String deleteAuthor(@RequestBody Author author) throws SQLException {
+	@RequestMapping(value = "/api/authors/{authorId}", method = RequestMethod.DELETE, consumes="application/json ")
+	public String deleteAuthor(@RequestBody Author author, @PathVariable Integer authorId) throws SQLException {
+		author.setAuthorId(authorId);
 		adao.deleteAuthor(author);
 		return "Author deleted successfully!";
 	}
@@ -170,42 +198,53 @@ public class AdminService {
     //================================================================================
 
 	@Transactional
-	@RequestMapping(value = "/api/addBorrower", method = RequestMethod.POST, consumes="application/json")
-	public String addBorrower(@RequestBody Borrower borrower) throws SQLException {
-		bodao.addBorrower(borrower);
-		return "borrower Added - Success is in the AIR!";
+	@RequestMapping(value = "/api/borrowers", method = RequestMethod.POST, consumes="application/json")
+	public Borrower addBorrower(@RequestBody Borrower borrower) throws SQLException {
+		Integer cardNo = bodao.addBorrowerWithID(borrower);
+		Borrower newBorrower  = bodao.readBorrowerByPK(cardNo);
+		return newBorrower;
+		//bodao.addBorrower(borrower);
+		//return "borrower Added - Success is in the AIR!";
 	}
 	
 	@Transactional
-	@RequestMapping(value = "/api/editBorrower", method = RequestMethod.POST, 
+	@RequestMapping(value = "/api/borrowers/{cardNo}", method = RequestMethod.PUT, 
 			consumes="application/json", produces="application/json")
-	public List<Borrower> editBook(@RequestBody Borrower borrower) throws SQLException {
+	public List<Borrower> editBook(@RequestBody Borrower borrower, @PathVariable Integer cardNo) throws SQLException {
+		borrower.setCardNo(cardNo);
 		bodao.updateBorrower(borrower);
-		return a_viewborrowers();
+		return a_viewborrowers(null, null);
 	}
 	
-	@RequestMapping(value = "/api/a_viewborrowers/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
-	public List<Borrower> a_viewborrowers(@PathVariable Integer pageNo, 
-			@PathVariable String searchString) throws SQLException { 
-		List<Borrower> borrowers =  bodao.readAllBorrowersByName(pageNo, searchString);
-		for (Borrower bo: borrowers){
-			bo.setBookLoans(bldao.readAllBookLoansByCardNo(bo.getCardNo()));
+//	@RequestMapping(value = "/api/borrowers", method = RequestMethod.GET, produces="application/json")
+//	public List<Borrower> a_viewborrowers() throws SQLException { 
+//		List<Borrower> borrowers =  bodao.readAllBorrowers();
+//		for (Borrower bo: borrowers){
+//			bo.setBookLoans(bldao.readAllBookLoansByCardNo(bo.getCardNo()));
+//		}
+//		return borrowers;
+//	}
+//	
+//	@RequestMapping(value = "/api/borrowers", method = RequestMethod.GET, produces="application/json")
+//	public List<Borrower> a_viewborrowers(@RequestParam(value = "pageNo", required = true) Integer pageNo) throws SQLException { 
+//		List<Borrower> borrowers =  bodao.readAllBorrowers(pageNo);
+//		for (Borrower bo: borrowers){
+//			bo.setBookLoans(bldao.readAllBookLoansByCardNo(bo.getCardNo()));
+//		}
+//		return borrowers;
+//	}
+	
+	@RequestMapping(value = "/api/borrowers", method = RequestMethod.GET, produces="application/json")
+	public List<Borrower> a_viewborrowers(@RequestParam(value = "pageNo", required = false) Integer pageNo, 
+			@RequestParam(value = "searchString", required = false) String searchString) throws SQLException { 
+		List<Borrower> borrowers =  new ArrayList<Borrower>();
+		if (pageNo!=null && searchString!=null){
+			borrowers =  bodao.readAllBorrowersByName(pageNo, searchString);
+		}else if (pageNo!=null){
+			borrowers =  bodao.readAllBorrowers(pageNo);
+		}else{
+			borrowers =  bodao.readAllBorrowers();
 		}
-		return borrowers;
-	}
-	
-	@RequestMapping(value = "/a_viewborrowers/{pageNo}", method = RequestMethod.GET, produces="application/json")
-	public List<Borrower> a_viewborrowers(@PathVariable Integer pageNo) throws SQLException { 
-		List<Borrower> borrowers =  bodao.readAllBorrowers(pageNo);
-		for (Borrower bo: borrowers){
-			bo.setBookLoans(bldao.readAllBookLoansByCardNo(bo.getCardNo()));
-		}
-		return borrowers;
-	}
-	
-	@RequestMapping(value = "/a_viewborrowers", method = RequestMethod.GET, produces="application/json")
-	public List<Borrower> a_viewborrowers() throws SQLException { 
-		List<Borrower> borrowers =  bodao.readAllBorrowers();
 		for (Borrower bo: borrowers){
 			bo.setBookLoans(bldao.readAllBookLoansByCardNo(bo.getCardNo()));
 		}
@@ -213,8 +252,9 @@ public class AdminService {
 	}
 	
 	@Transactional
-	@RequestMapping(value = "deleteBorrower", method = RequestMethod.POST, consumes="application/json ")
-	public String deleteBorrower(@RequestBody Borrower borrower) throws SQLException {
+	@RequestMapping(value = "/api/borrowers/{cardNo}", method = RequestMethod.DELETE, consumes="application/json ")
+	public String deleteBorrower(@RequestBody Borrower borrower, @PathVariable Integer cardNo) throws SQLException {
+		borrower.setCardNo(cardNo);
 		bodao.deleteBorrower(borrower);
 		return "borrower deleted successfully!";
 	}
@@ -224,44 +264,54 @@ public class AdminService {
     //================================================================================
 	
 	@Transactional
-	@RequestMapping(value = "/api/addBranch", method = RequestMethod.POST, consumes="application/json")
-	public String addBranch(@RequestBody Branch branch) throws SQLException {
-		brdao.addBranch(branch);
-		return "branch Added - Success is in the AIR!";
+	@RequestMapping(value = "/api/branches", method = RequestMethod.POST, consumes="application/json")
+	public Branch addBranch(@RequestBody Branch branch) throws SQLException {
+		Integer branchId = brdao.addBranchWithID(branch);
+		Branch newBranch = brdao.readBranchByPK(branchId);
+		return newBranch;
+		//return "branch Added - Success is in the AIR!";
 	}
 	
 	@Transactional
-	@RequestMapping(value = "/api/editBranch", method = RequestMethod.POST, 
+	@RequestMapping(value = "/api/branches/{branchId}", method = RequestMethod.PUT, 
 			consumes="application/json", produces="application/json")
-	public List<Branch> editBranch(@RequestBody Branch branch) throws SQLException {
+	public List<Branch> editBranch(@RequestBody Branch branch, @PathVariable Integer branchId) throws SQLException {
+		branch.setBranchId(branchId);
 		brdao.updateBranch(branch);
-		return a_viewbranches();
+		return a_viewbranches(null, null);
 	}
 	
-	@RequestMapping(value = "/api/a_viewbranches/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
-	public List<Branch> a_viewbranches(@PathVariable Integer pageNo, 
-			@PathVariable String searchString) throws SQLException { 
-		List<Branch> branches =  brdao.readAllBranchesByName(pageNo, searchString);
-		for (Branch br: branches){
-			br.setBooks(bdao.readAllBooksByBranchId(br.getBranchId()));
-			br.setBookLoans(bldao.readAllBookLoansByBranchId(br.getBranchId()));
+//	@RequestMapping(value = "/api/branches", method = RequestMethod.GET, produces="application/json")
+//	public List<Branch> a_viewbranches() throws SQLException { 
+//		List<Branch> branches =  brdao.readAllBranches();
+//		for (Branch br: branches){
+//			br.setBooks(bdao.readAllBooksByBranchId(br.getBranchId()));
+//			br.setBookLoans(bldao.readAllBookLoansByBranchId(br.getBranchId()));
+//		}
+//		return branches;
+//	}
+//	
+//	@RequestMapping(value = "/api/branches", method = RequestMethod.GET, produces="application/json")
+//	public List<Branch> a_viewbranches(@RequestParam(value = "pageNo", required = false) Integer pageNo) throws SQLException { 
+//		List<Branch> branches =  brdao.readAllBranches(pageNo);
+//		for (Branch br: branches){
+//			br.setBooks(bdao.readAllBooksByBranchId(br.getBranchId()));
+//			br.setBookLoans(bldao.readAllBookLoansByBranchId(br.getBranchId()));
+//		}
+//		return branches;
+//	}
+	
+	@RequestMapping(value = "/api/branches", method = RequestMethod.GET, produces="application/json")
+	public List<Branch> a_viewbranches(@RequestParam(value = "pageNo", required = false) Integer pageNo, 
+			@RequestParam(value = "searchString", required = false) String searchString) throws SQLException { 
+		List<Branch> branches =  new ArrayList<Branch>();
+		if (pageNo != null && searchString != null){
+			branches = brdao.readAllBranchesByName(pageNo, searchString);
+		}else if (pageNo != null){
+			branches =  brdao.readAllBranches(pageNo);
+		}else{
+			branches =  brdao.readAllBranches();
 		}
-		return branches;
-	}
-	
-	@RequestMapping(value = "/api/a_viewbranches/{pageNo}", method = RequestMethod.GET, produces="application/json")
-	public List<Branch> a_viewbranches(@PathVariable Integer pageNo) throws SQLException { 
-		List<Branch> branches =  brdao.readAllBranches(pageNo);
-		for (Branch br: branches){
-			br.setBooks(bdao.readAllBooksByBranchId(br.getBranchId()));
-			br.setBookLoans(bldao.readAllBookLoansByBranchId(br.getBranchId()));
-		}
-		return branches;
-	}
-	
-	@RequestMapping(value = "/api/a_viewbranches", method = RequestMethod.GET, produces="application/json")
-	public List<Branch> a_viewbranches() throws SQLException { 
-		List<Branch> branches =  brdao.readAllBranches();
 		for (Branch br: branches){
 			br.setBooks(bdao.readAllBooksByBranchId(br.getBranchId()));
 			br.setBookLoans(bldao.readAllBookLoansByBranchId(br.getBranchId()));
@@ -270,8 +320,9 @@ public class AdminService {
 	}
 	
 	@Transactional
-	@RequestMapping(value = "/api/deleteBranch", method = RequestMethod.POST, consumes="application/json ")
-	public String deleteBranch(@RequestBody Branch branch) throws SQLException {
+	@RequestMapping(value = "/api/branches/{branchId}", method = RequestMethod.DELETE, consumes="application/json ")
+	public String deleteBranch(@RequestBody Branch branch, @PathVariable Integer branchId) throws SQLException {
+		branch.setBranchId(branchId);
 		brdao.deleteBranch(branch);
 		return "branch deleted successfully!";
 	}
@@ -282,42 +333,51 @@ public class AdminService {
 	
 	
 	@Transactional
-	@RequestMapping(value = "/api/addPublisher", method = RequestMethod.POST, consumes="application/json")
-	public String addPublisher(@RequestBody Publisher publisher) throws SQLException {
-		pdao.addPublisher(publisher);
-		return "publisher Added - Success is in the AIR!";
+	@RequestMapping(value = "/api/publishers", method = RequestMethod.POST, consumes="application/json")
+	public Publisher addPublisher(@RequestBody Publisher publisher) throws SQLException {
+		Integer publisherId = pdao.addPublisherWithID(publisher);
+		Publisher newPublisher = pdao.readPublisherByPubId(publisherId);
+		return newPublisher;
 	}
 	
 	@Transactional
-	@RequestMapping(value = "/api/editPublisher", method = RequestMethod.POST, 
+	@RequestMapping(value = "/api/publishers/{publisherId}", method = RequestMethod.PUT, 
 			consumes="application/json", produces="application/json")
-	public List<Publisher> editPulisher(@RequestBody Publisher publisher) throws SQLException {
+	public List<Publisher> editPulisher(@RequestBody Publisher publisher, @PathVariable Integer publisherId) throws SQLException {
+		publisher.setPublisherId(publisherId);
 		pdao.updatePublisher(publisher);
-		return a_viewpublishers();
+		return a_viewpublishers(null, null);
 	}
 	
-	@RequestMapping(value = "/api/a_viewpublishers/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
-	public List<Publisher> a_viewpublishers(@PathVariable Integer pageNo, 
-			@PathVariable String searchString) throws SQLException { 
-		List<Publisher> publishers =  pdao.readAllPublishersByName(pageNo, searchString);
-		for (Publisher p:publishers){
-			p.setBooks(bdao.readAllBooksByPublisherId(p.getPublisherId()));
+//	@RequestMapping(value = "/api/publishers", method = RequestMethod.GET, produces="application/json")
+//	public List<Publisher> a_viewpublishers() throws SQLException { 
+//		List<Publisher> publishers =  pdao.readAllPublishers();
+//		for (Publisher p:publishers){
+//			p.setBooks(bdao.readAllBooksByPublisherId(p.getPublisherId()));
+//		}
+//		return publishers;
+//	}
+//	
+//	@RequestMapping(value = "/api/publishers", method = RequestMethod.GET, produces="application/json")
+//	public List<Publisher> a_viewpublishers(@RequestParam(value = "pageNo", required = false) Integer pageNo) throws SQLException { 
+//		List<Publisher> publishers =  pdao.readAllPublishers(pageNo);
+//		for (Publisher p:publishers){
+//			p.setBooks(bdao.readAllBooksByPublisherId(p.getPublisherId()));
+//		}
+//		return publishers;
+//	}
+	
+	@RequestMapping(value = "/api/publishers", method = RequestMethod.GET, produces="application/json")
+	public List<Publisher> a_viewpublishers(@RequestParam(value = "pageNo", required = false) Integer pageNo, 
+			@RequestParam(value = "searchString", required = false) String searchString) throws SQLException { 
+		List<Publisher> publishers =  new ArrayList<Publisher>();
+		if (pageNo != null && searchString != null){
+			publishers = pdao.readAllPublishersByName(pageNo, searchString);
+		}else if (pageNo != null){
+			publishers =  pdao.readAllPublishers(pageNo);
+		}else{
+			publishers =  pdao.readAllPublishers();
 		}
-		return publishers;
-	}
-	
-	@RequestMapping(value = "/api/a_viewpublishers/{pageNo}", method = RequestMethod.GET, produces="application/json")
-	public List<Publisher> a_viewpublishers(@PathVariable Integer pageNo) throws SQLException { 
-		List<Publisher> publishers =  pdao.readAllPublishers(pageNo);
-		for (Publisher p:publishers){
-			p.setBooks(bdao.readAllBooksByPublisherId(p.getPublisherId()));
-		}
-		return publishers;
-	}
-	
-	@RequestMapping(value = "/api/a_viewpublishers", method = RequestMethod.GET, produces="application/json")
-	public List<Publisher> a_viewpublishers() throws SQLException { 
-		List<Publisher> publishers =  pdao.readAllPublishers();
 		for (Publisher p:publishers){
 			p.setBooks(bdao.readAllBooksByPublisherId(p.getPublisherId()));
 		}
@@ -325,7 +385,7 @@ public class AdminService {
 	}
 	
 	@Transactional
-	@RequestMapping(value = "/api/deletePublisher", method = RequestMethod.POST, consumes="application/json ")
+	@RequestMapping(value = "/api/publishers", method = RequestMethod.DELETE, consumes="application/json ")
 	public String deletePublisher(@RequestBody Publisher publisher) throws SQLException {
 		pdao.deletePublisher(publisher);
 		return "publisher deleted successfully!";
@@ -337,26 +397,40 @@ public class AdminService {
 	
 	
 	@Transactional
-	@RequestMapping(value = "/api/editBookLoan", method = RequestMethod.POST, 
+	@RequestMapping(value = "/api/bookloans/bookId/branchId/cardNo/dateOut", method = RequestMethod.PUT, 
 			consumes="application/json", produces="application/json")
-	public List<BookLoan> editBookLoan(@RequestBody BookLoan bookloan) throws SQLException {
+	public List<BookLoan> editBookLoan(@RequestBody BookLoan bookloan, @PathVariable Integer bookId,
+			@PathVariable Integer branchId, @PathVariable Integer cardNo, 
+			@PathVariable String dateOut) throws SQLException {
+		bookloan.setDateOut(dateOut);
+		// may be pass date out in the body
+		// this method is for overriding the due date
+		bookloan.setBook(bdao.readBookByPK(bookId));
+		bookloan.setBorrower(bodao.readBorrowerByPK(cardNo));
+		bookloan.setBranch(brdao.readBranchByPK(branchId));
 		bldao.updateBookLoan(bookloan);
-		return a_viewbookloans();
+		return a_viewbookloans(null, null);
 	}
 	
-	@RequestMapping(value = "/api/a_viewbookloans", method = RequestMethod.GET, produces="application/json")
-	public List<BookLoan> a_viewbookloans() throws SQLException {
-		return bldao.readAllBookLoans();
-	}
+//	@RequestMapping(value = "/api/bookloans", method = RequestMethod.GET, produces="application/json")
+//	public List<BookLoan> a_viewbookloans() throws SQLException {
+//		return bldao.readAllBookLoans();
+//	}
+//	
+//	@RequestMapping(value = "/api/a_viewbookloans", method = RequestMethod.GET, produces="application/json")
+//	public List<BookLoan> a_viewbookloans(@RequestParam(value = "pageNo", required = false) Integer pageNo) throws SQLException {
+//		return bldao.readAllBookLoans(pageNo);
+//	}
 	
-	@RequestMapping(value = "/api/a_viewbookloans/{pageNo}", method = RequestMethod.GET, produces="application/json")
-	public List<BookLoan> a_viewbookloans(@PathVariable Integer pageNo) throws SQLException {
-		return bldao.readAllBookLoans(pageNo);
-	}
-	
-	@RequestMapping(value = "/api/a_viewbookloans/{pageNo}/{searchString}", method = RequestMethod.GET, produces="application/json")
-	public List<BookLoan> a_viewbookloans(@PathVariable Integer pageNo, 
-			@PathVariable String searchString) throws SQLException {
-		return bldao.readAllBookLoansByDateOut(pageNo, searchString);
+	@RequestMapping(value = "/api/viewbookloans", method = RequestMethod.GET, produces="application/json")
+	public List<BookLoan> a_viewbookloans(@RequestParam(value = "pageNo", required = false) Integer pageNo, 
+			@RequestParam(value = "searchString", required = false) String searchString) throws SQLException {
+		if (pageNo != null && searchString != null){
+			return bldao.readAllBookLoansByDateOut(pageNo, searchString);
+		}else if (pageNo != null){
+			return bldao.readAllBookLoans(pageNo);
+		}else{
+			return bldao.readAllBookLoans();
+		}
 	}
 }
