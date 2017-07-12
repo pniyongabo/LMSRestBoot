@@ -18,17 +18,20 @@ import com.mysql.jdbc.Statement;
 public class BorrowerDAO extends BaseDAO implements ResultSetExtractor<List<Borrower>>{
 
 	public void addBorrower(Borrower borrower) throws SQLException{
-		template.update("insert into tbl_borrower(name) values (?)", new Object[] {borrower.getName()});
+		template.update("insert into tbl_borrower(name, address, phone) values (?)", new Object[] {
+				borrower.getName(), borrower.getAddress(), borrower.getPhone()});
 	}
 	
 	public Integer addBorrowerWithID(Borrower borrower) throws SQLException{
 		KeyHolder holder = new GeneratedKeyHolder();
-		final String sql = "insert into tbl_borrower(name) values (?)";
+		final String sql = "insert into tbl_borrower(name, address, phone) values (?)";
 		template.update(new PreparedStatementCreator() {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
 				PreparedStatement ps = connection.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, borrower.getName());
+				ps.setString(2, borrower.getAddress());
+				ps.setString(3, borrower.getPhone());
 				return ps;
 			}
 		}, holder);

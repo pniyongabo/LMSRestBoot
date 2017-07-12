@@ -446,14 +446,14 @@ public class AdminService {
 	// return bldao.readAllBookLoans();
 	// }
 	//
-	// @RequestMapping(value = "/api/a_viewbookloans", method =
+	// @RequestMapping(value = "/api/bookloans", method =
 	// RequestMethod.GET, produces="application/json")
 	// public List<BookLoan> a_viewbookloans(@RequestParam(value = "pageNo",
 	// required = false) Integer pageNo) throws SQLException {
 	// return bldao.readAllBookLoans(pageNo);
 	// }
 
-	@RequestMapping(value = "/api/viewbookloans", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/api/bookloans", method = RequestMethod.GET, produces = "application/json")
 	public List<BookLoan> a_viewbookloans(@RequestParam(value = "pageNo", required = false) Integer pageNo,
 			@RequestParam(value = "searchString", required = false) String searchString) throws SQLException {
 		if (searchString != null) {

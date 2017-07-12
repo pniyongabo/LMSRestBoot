@@ -18,7 +18,8 @@ import com.mysql.jdbc.Statement;
 public class PublisherDAO extends BaseDAO implements ResultSetExtractor<List<Publisher>>{
 
 	public void addPublisher(Publisher publisher) throws SQLException{
-		template.update("insert into tbl_publisher(publisherName) values (?)", new Object[] {publisher.getPublisherName()});
+		template.update("insert into tbl_publisher(publisherName, publisherAddress, publisherPhone) values (?)", new Object[] {
+				publisher.getPublisherName(), publisher.getPublisherAddress(), publisher.getPublisherPhone()});
 	}
 	
 	public void addPublisherBook(Publisher publisher, Integer bookId) throws SQLException{
@@ -27,12 +28,14 @@ public class PublisherDAO extends BaseDAO implements ResultSetExtractor<List<Pub
 	
 	public Integer addPublisherWithID(Publisher publisher) throws SQLException{
 		KeyHolder holder = new GeneratedKeyHolder();
-		final String sql = "insert into tbl_publisher(publisherName) values (?)";
+		final String sql = "insert into tbl_publisher(publisherName, publisherAddress, publisherPhone) values (?,?,?,?)";
 		template.update(new PreparedStatementCreator() {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
 				PreparedStatement ps = connection.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, publisher.getPublisherName());
+				ps.setString(2, publisher.getPublisherAddress());
+				ps.setString(3, publisher.getPublisherPhone());
 				return ps;
 			}
 		}, holder);

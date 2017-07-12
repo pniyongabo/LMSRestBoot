@@ -19,7 +19,8 @@ import com.mysql.jdbc.Statement;
 public class BranchDAO extends BaseDAO implements ResultSetExtractor<List<Branch>>{
 
 	public void addBranch(Branch branch) throws SQLException{
-		template.update("insert into tbl_library_branch(branchName) values (?)", new Object[] {branch.getBranchName()});
+		template.update("insert into tbl_library_branch(branchName, branchAddress) values (?)", new Object[] {
+				branch.getBranchName(),branch.getBranchAddress()});
 	}
 	
 	public void addBranchWithAddress(Branch branch) throws SQLException{
@@ -28,12 +29,13 @@ public class BranchDAO extends BaseDAO implements ResultSetExtractor<List<Branch
 	
 	public Integer addBranchWithID(Branch branch) throws SQLException{
 		KeyHolder holder = new GeneratedKeyHolder();
-		final String sql = "insert into tbl_library_branch(branchName) values (?)";
+		final String sql = "insert into tbl_library_branch(branchName, branchAddress) values (?, ?)";
 		template.update(new PreparedStatementCreator() {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
 				PreparedStatement ps = connection.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, branch.getBranchName());
+				ps.setString(2, branch.getBranchAddress());
 				return ps;
 			}
 		}, holder);
