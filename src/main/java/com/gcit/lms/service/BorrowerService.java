@@ -42,25 +42,26 @@ public class BorrowerService {
 	@Autowired
 	BookCopyDAO bcdao;
 	
-	@RequestMapping(value = "/b_viewbookloansbyuser", method = RequestMethod.GET, 
-			consumes="application/json", produces="application/json")
-	public List<BookLoan> b_viewbookloansbyuser(@RequestBody Borrower borrower) throws SQLException {
-		return bldao.readAllBookLoansByBorrower(borrower);
-	}
+//	@RequestMapping(value = "/api/bookloans/{cardNo}", method = RequestMethod.GET, 
+//			consumes="application/json", produces="application/json")
+//	public List<BookLoan> b_viewbookloansbyuser(@PathVariable Integer cardNo) throws SQLException {
+//		Borrower borrower = bodao.readBorrowerByPK(cardNo);
+//		return bldao.readAllBookLoansByBorrower(borrower);
+//	}
 	
-	@RequestMapping(value = "/b_viewbookloansbyuser/{cardNo}", 
+	@RequestMapping(value = "/bookloans/{cardNo}", 
 			method = RequestMethod.GET, produces="application/json")
 	public List<BookLoan> b_viewbookloansbyuser(@PathVariable Integer cardNo) throws SQLException {
 		return bldao.readAllBookLoansByCardNo(cardNo);
 	}
 	
-	@RequestMapping(value = "/b_viewduebookloansbyuser", method = RequestMethod.GET, 
-			consumes="application/json", produces="application/json")
-	public List<BookLoan> b_viewduebookloansbyuser(@RequestBody Borrower borrower) throws SQLException {
-		return bldao.readAllDueBookLoansByBorrower(borrower);
-	}
+//	@RequestMapping(value = "/duebookloansbyuser", method = RequestMethod.GET, 
+//			consumes="application/json", produces="application/json")
+//	public List<BookLoan> b_viewduebookloansbyuser(@RequestBody Borrower borrower) throws SQLException {
+//		return bldao.readAllDueBookLoansByBorrower(borrower);
+//	}
 	
-	@RequestMapping(value = "/b_viewduebookloansbyuser/{cardNo}", 
+	@RequestMapping(value = "/duebookloans/{cardNo}", 
 			method = RequestMethod.GET, produces="application/json")
 	public List<BookLoan> b_viewduebookloansbyuser(@PathVariable Integer cardNo) throws SQLException {
 		return bldao.readAllDueBookLoansByCardNo(cardNo);
@@ -92,9 +93,10 @@ public class BorrowerService {
 		return "Borrower card number should be a positive number!";
 	}
 	
-	@RequestMapping(value = "/b_viewbooksavailableatbranch", method = RequestMethod.POST, 
+	@RequestMapping(value = "/books/{branchId}", method = RequestMethod.GET, 
 			consumes="application/json",produces="application/json")
-	public List<BookCopy> b_viewbooksavailableatbranch(@RequestBody Branch branch) throws SQLException { 
+	public List<BookCopy> b_viewbooksavailableatbranch(@PathVariable Integer branchId) throws SQLException { 
+		Branch branch = brdao.readBranchByPK(branchId);
 		return bcdao.readAllBookCopiesByBranch(branch);
 	}
 	

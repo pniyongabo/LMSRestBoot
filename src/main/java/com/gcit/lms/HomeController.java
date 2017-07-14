@@ -17,6 +17,11 @@ public class HomeController {
 	@Autowired
 	AdminService adminService;
 	
+	@RequestMapping(value = "/")
+	public String welcome() {
+		return "Welcome to back end!";
+	}
+	
 	@RequestMapping(value = "/api/hello")
 	public String home() {
 		return "Welcome to back end!";
