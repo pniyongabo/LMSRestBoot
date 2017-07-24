@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import com.gcit.lms.entity.Book;
 import com.gcit.lms.entity.Genre;
 import com.mysql.jdbc.Statement;
 
@@ -49,6 +50,27 @@ public class GenreDAO extends BaseDAO implements ResultSetExtractor<List<Genre>>
 	
 	public List<Genre> readAllGenres() throws SQLException{
 		return (List<Genre>) template.query("select * from tbl_genre", this);
+	}
+	
+	public List<Genre> readAllGenres(Integer pageNo) throws SQLException{
+		setPageNo(pageNo);
+		if (pageNo>0){
+			int index = (getPageNo() - 1) * 10;
+			return  template.query("select * from tbl_genre" + " LIMIT " + index + " , " + getPageSize(), this);
+		}else{
+			return  template.query("select * from tbl_genre", this);	
+		}
+	}
+	
+	public List<Genre> readAllGenres(Integer pageNo, String searchString) throws SQLException{
+		searchString = "%"+searchString+"%";
+		setPageNo(pageNo);
+		if (pageNo>0){
+			int index = (getPageNo() - 1) * 10;
+			return template.query("select * from tbl_genre where genre_name like ?" + " LIMIT " + index + " , " + getPageSize(), new Object[]{searchString}, this);
+		}else{
+			return template.query("select * from tbl_genre where genre_name like ?", new Object[]{searchString}, this);
+		}
 	}
 	
 	public List<Genre> readAllGenresByName(String searchString) throws SQLException{ // more like search

@@ -22,18 +22,17 @@ import com.gcit.lms.service.LibrarianService;
 @Configuration
 public class LMSConfig {
 	
-//	public String driver = "com.mysql.jdbc.Driver";
-//	public String url = "jdbc:mysql://localhost/library";
-//	public String username = "root";
-//	public String password = "root";
-	
 	public String driver = "com.mysql.jdbc.Driver";
-	//public String url = "jdbc:mysql://library.c4uwpmj5ivko.us-east-1.rds.amazonaws.com:3306/library";
-	public String awsDbEndpoint = "testrds.c4uwpmj5ivko.us-east-1.rds.amazonaws.com:3306/";
-	public String dbName = "library";
-	public String url = "jdbc:mysql://" + awsDbEndpoint + dbName;
-	public String username = "rootroot";
-	public String password = "rootroot";
+	public String url = "jdbc:mysql://localhost/library";
+	public String username = "root";
+	public String password = "root";
+	
+//	public String driver = "com.mysql.jdbc.Driver";
+//	public String awsDbEndpoint = "testrds.c4uwpmj5ivko.us-east-1.rds.amazonaws.com:3306/";
+//	public String dbName = "library";
+//	public String url = "jdbc:mysql://" + awsDbEndpoint + dbName;
+//	public String username = "rootroot";
+//	public String password = "rootroot";
 	
 	@Bean
 	//@Scope(value="Prototype")

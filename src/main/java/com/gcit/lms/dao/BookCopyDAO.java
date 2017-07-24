@@ -85,6 +85,27 @@ public class BookCopyDAO extends BaseDAO implements ResultSetExtractor<List<Book
 		return  template.query("select * from tbl_book_copies", this);
 	}
 	
+	public List<BookCopy> readAllBookCopies(Integer pageNo) throws SQLException{
+		setPageNo(pageNo);
+		if ( pageNo > 0){
+			int index = (getPageNo() - 1) * 10;
+			return template.query("select * from tbl_book_copies"+" LIMIT " + index + " , " + getPageSize(), this);
+		}else{
+			return  template.query("select * from tbl_book_copies", this);
+		}
+	}
+	
+	public List<BookCopy> readAllBookCopies(Integer pageNo, String searchString) throws SQLException{
+		searchString = "%"+searchString+"%";
+		setPageNo(pageNo);
+		if (pageNo > 0){
+			int index = (getPageNo() - 1) * 10;
+			return template.query("SELECT * FROM tbl_book_copies  JOIN tbl_book ON tbl_book.bookId = tbl_book_copies.bookId WHERE tbl_book.title like ?" +" LIMIT " + index + " , " + getPageSize(), new Object[]{searchString}, this);
+		}else{
+			return template.query("SELECT * FROM tbl_book_copies  JOIN tbl_book ON tbl_book.bookId = tbl_book_copies.bookId WHERE tbl_book.title like ?", new Object[]{searchString}, this);
+		}
+	}
+	
 	public List<BookCopy> readAllBookCopiesByBook(Book book) throws SQLException{
 		return template.query("select * from tbl_book_copies where bookId = ?", new Object[]{book.getBookId()}, this);
 	}
