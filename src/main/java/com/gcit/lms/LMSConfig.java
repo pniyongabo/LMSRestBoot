@@ -1,11 +1,14 @@
 package com.gcit.lms;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import com.gcit.lms.dao.AuthorDAO;
 import com.gcit.lms.dao.BookCopyDAO;
@@ -19,8 +22,10 @@ import com.gcit.lms.service.AdminService;
 import com.gcit.lms.service.BorrowerService;
 import com.gcit.lms.service.LibrarianService;
 
+
+
 @Configuration
-public class LMSConfig {
+public class LMSConfig extends WebMvcConfigurerAdapter{
 	
 	public String driver = "com.mysql.jdbc.Driver";
 	public String url = "jdbc:mysql://localhost/library";
@@ -33,6 +38,18 @@ public class LMSConfig {
 //	public String url = "jdbc:mysql://" + awsDbEndpoint + dbName;
 //	public String username = "rootroot";
 //	public String password = "rootroot";
+	
+	@Value("${spring.profiles.active}")
+	private String profile;
+
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		if(!profile.equalsIgnoreCase("LOCAL")) {
+			registry.addInterceptor(new AuthenticationInterceptor())
+			.addPathPatterns("/**")	
+					.excludePathPatterns("/public/**", "/*swagger*/**", "/v2/api-docs");
+		}
+	}
 	
 	@Bean
 	//@Scope(value="Prototype")
