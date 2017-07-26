@@ -22,10 +22,13 @@ import com.gcit.lms.service.AdminService;
 import com.gcit.lms.service.BorrowerService;
 import com.gcit.lms.service.LibrarianService;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Configuration
 public class LMSConfig extends WebMvcConfigurerAdapter{
+	
+	static Logger logger  = LoggerFactory.getLogger(LMSConfig.class);
 	
 	public String driver = "com.mysql.jdbc.Driver";
 	public String url = "jdbc:mysql://localhost/library";
@@ -44,6 +47,8 @@ public class LMSConfig extends WebMvcConfigurerAdapter{
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
+		//Logger logger = LoggerFactory.getLogger(LMSConfig.class);
+		logger.info("Hello World, This is the App Config File!");
 		if(!profile.equalsIgnoreCase("LOCAL")) {
 			registry.addInterceptor(new AuthenticationInterceptor())
 			.addPathPatterns("/**")	
