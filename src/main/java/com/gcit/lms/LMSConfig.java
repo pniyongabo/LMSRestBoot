@@ -33,10 +33,11 @@ public class LMSConfig extends WebMvcConfigurerAdapter{
 //	public String driver = "com.mysql.jdbc.Driver";
 //	public String url = "jdbc:mysql://localhost/library";
 //	public String username = "root";
-//	public String password = "root";
+//	public String password = "root"; nt: 
 	
 	public String driver = "com.mysql.jdbc.Driver";
-	public String awsDbEndpoint = "testrds.c4uwpmj5ivko.us-east-1.rds.amazonaws.com:3306/";
+	public String awsDbEndpoint = "anotherdb.cw0htgkyg1gl.us-east-2.rds.amazonaws.com:3306/";
+	//public String awsDbEndpoint = "testrds.c4uwpmj5ivko.us-east-1.rds.amazonaws.com:3306/";
 	public String dbName = "library";
 	public String url = "jdbc:mysql://" + awsDbEndpoint + dbName;
 	public String username = "rootroot";
